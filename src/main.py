@@ -42,8 +42,12 @@ def handle_projects():
             raise APIException('You need to specify the description', status_code=400)
         if "image" not in body:
             raise APIException('You need to specify the images', status_code=400)
+        if "github" not in body:
+            raise APIException('You need to specify the github address', status_code=400)
+        if "demo" not in body:
+            raise APIException('You need to specify the demo\'s link')
         
-        project1=Projects(name=body['name'], description=body["description"], image=body['image'])
+        project1=Projects(name=body['name'], description=body["description"], image=body['image'], github=body['github'], demo=body['demo'])
         db.session.add(project1)
         db.session.commit()
         return 'ok', 200
