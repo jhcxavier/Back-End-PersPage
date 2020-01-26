@@ -58,6 +58,31 @@ def handle_projects():
         return jsonify(all_projects), 200
     # return jsonify(project1), 200
 
+@app.route('/projects/<int:project_id>', methods=['PUT', 'GET', 'DELETE'])
+def get_single_project(project_id):
+
+    if request.method == 'PUT':
+        body = request.get_json()
+        if body is None:
+            raise APIException("You need to specify the request body as a json object", status_code=400)
+        
+        project1 = Projects.query.get(project_id)
+        if "name" in body:
+            project1.name = body['name']
+        if 'description' in body:
+            project1.description = body['description']
+        if 'image' in body:
+            project1.image = body['description']
+        if 'github' in body:
+            project1.github = body['github']
+        if 'demo' in body: 
+            project1.demo = body['demo']
+        db.session.commit()
+
+        return jsonify(project1.serialize()), 200
+    return "Invalid Method", 404
+
+
 # this only runs if `$ python src/main.py` is executed
 if __name__ == '__main__':
     PORT = int(os.environ.get('PORT', 3000))
