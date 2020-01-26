@@ -7,7 +7,7 @@ from flask_migrate import Migrate
 from flask_swagger import swagger
 from flask_cors import CORS
 from utils import APIException, generate_sitemap
-from models import db, Projects, TechSkills
+from models import db, Projects, TechSkills, SoftSkills
 #from models import Person
 
 app = Flask(__name__)
@@ -170,6 +170,78 @@ def handle_single_skill(skill_id):
 
     if request.method == 'DELETE':
         skills = TechSkills.query.get(skill_id)
+        if skills is None:
+            raise APIException('User not found', status_code=400)
+        db.session.delete(skills)
+        db.session.commit()
+        return "ok", 200
+
+    return "Invalid Method", 404
+
+################################################
+# SOFT SKILLS METHODS
+################################################
+
+#POST AND GET
+@app.route('/softskills', methods=['POST', 'GET'])
+def handle_soft_skills():
+
+        #POST method
+    if request.method == "POST":
+        body = request.get_json()
+        #Conditions for request!
+        if body is None:
+            raise APIException("You need to specify the request body as a json object", status_code=400)
+        if "name" not in body:
+            raise APIException('You need to specify the name', status_code=400)
+        if "skillImage" not in body:
+            raise APIException('You need to specify the skillImage', status_code=400)
+        
+        skills = SoftSkills(name = body['name'], skillImage = body["skillImage"])
+        db.session.add(skills)
+        db.session.commit()
+
+        return 'ok', 200
+
+        #GET Method
+    if request.method == 'GET':
+        all_skills = SoftSkills.query.all()
+        all_skills = list(map(lambda x: x.serialize(), all_skills))
+        return jsonify(all_skills), 200
+
+#PUT, GET AND DELETE
+@app.route("/softskills/<int:skill_id>", methods=["PUT", "GET", "DELETE"])
+def handle_single_soft_skill(skill_id):
+
+    # PUT Method
+
+    if request.method == "PUT":
+        body = request.get_json(skill_id)
+
+        if body is None:
+            raise APIException('You need to specify the request body as a json object', status_code = 400)
+        
+        skills = SoftSkills.query.get(skill_id)
+        if "name" in body:
+            skills.name = body['name']
+        if 'skillImage' in body:
+            skills.skillImage = body['skillImage']
+        
+        db.session.commit()
+
+        return jsonify(skills.serialize()), 200
+
+    # GET Method
+
+    if request.method == 'GET':
+        all_skills = SoftSkills.query.all()
+        all_skills = list(map(lambda x: x.serialize(), all_skills))
+        return jsonify(all_skills), 200
+
+    # DELETE Method
+
+    if request.method == 'DELETE':
+        skills = SoftSkills.query.get(skill_id)
         if skills is None:
             raise APIException('User not found', status_code=400)
         db.session.delete(skills)
