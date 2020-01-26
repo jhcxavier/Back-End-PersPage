@@ -11,7 +11,7 @@ class Projects(db.Model):
     demo = db.Column(db.String(120), unique=True, nullable=True)
 
     def __repr__(self):
-        return '<Ptoject %r>' % self.name
+        return '<Project %r>' % self.name
 
     def serialize(self):
         return {
@@ -21,4 +21,19 @@ class Projects(db.Model):
             "image": self.image,
             "github": self.github,
             "demo": self.demo
+        }
+        
+class TechSkills(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(80), unique=False, nullable=False)
+    skillImage = db.Column(db.String(60), unique=False, nullable=False)
+
+    def __repr__(self):
+        return '<TechSkills %r' % self.name
+    
+    def serialize(self):
+        return{
+            "id":self.id,
+            "name": self.name,
+            "skillImage": self.skillImage
         }
