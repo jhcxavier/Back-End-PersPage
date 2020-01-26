@@ -7,7 +7,7 @@ from flask_migrate import Migrate
 from flask_swagger import swagger
 from flask_cors import CORS
 from utils import APIException, generate_sitemap
-from models import db
+from models import db, Projects
 #from models import Person
 
 app = Flask(__name__)
@@ -28,14 +28,31 @@ def handle_invalid_usage(error):
 def sitemap():
     return generate_sitemap(app)
 
-@app.route('/hello', methods=['POST', 'GET'])
-def handle_hello():
+@app.route('/projects', methods=['POST', 'GET'])
+def handle_projects():
 
-    response_body = {
-        "hello": "world"
-    }
+    if request.method =='POST':
+        body = request.get_json()
 
-    return jsonify(response_body), 200
+        if body is None:
+            raise APIException("You need to specify the request body as a json object", status_code=400)
+        if "name" not in body:
+            raise APIException('You need to specify the name', status_code=400)
+        if "description" not in body:
+            raise APIException('You need to specify the description', status_code=400)
+        if "image" not in body:
+            raise APIException('You need to specify the images', status_code=400)
+        
+        project1=Projects(name=body['name'], description=body["description"], image=body['image'])
+        db.session.add(project1)
+        db.session.commit()
+        return 'ok', 200
+
+    if request.method == "GET":
+        all_projects = Projects.query.all()
+        all_projects = list(map(lambda x: x.serialize(), all_projects))
+        return jsonify(all_projects), 200
+    # return jsonify(project1), 200
 
 # this only runs if `$ python src/main.py` is executed
 if __name__ == '__main__':
