@@ -61,6 +61,8 @@ def handle_projects():
 @app.route('/projects/<int:project_id>', methods=['PUT', 'GET', 'DELETE'])
 def get_single_project(project_id):
 
+    # PUT Method
+
     if request.method == 'PUT':
         body = request.get_json()
         if body is None:
@@ -80,9 +82,27 @@ def get_single_project(project_id):
         db.session.commit()
 
         return jsonify(project1.serialize()), 200
-    return "Invalid Method", 404
+    
 
+    # GET Method
 
+    if request.method == "GET":
+        all_projects = Projects.query.all()
+        all_projects = list(map(lambda x: x.serialize(), all_projects))
+        return jsonify(all_projects), 200
+
+    # DELETE Method
+
+    if request.method == "DELETE":
+        project1 = Projects.query.get(project_id)
+        if project1 is None:
+            raise APIException('User not found', status_code=400)
+        db.session.delete(project1)
+        db.session.commit()
+        return "ok", 200
+    
+    return "Invalid method", 404
+    
 # this only runs if `$ python src/main.py` is executed
 if __name__ == '__main__':
     PORT = int(os.environ.get('PORT', 3000))
