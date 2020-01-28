@@ -281,44 +281,44 @@ def handle_articles():
         all_articles = list(map(lambda x: x.serialize(), all_articles))
         return jsonify(all_articles), 200
 
-#PUT, GET AND DELETE
-# @app.route("/softskills/<int:skill_id>", methods=["PUT", "GET", "DELETE"])
-# def handle_single_soft_skill(skill_id):
+# PUT, GET AND DELETE
+@app.route("/articles/<int:articles_id>", methods=["PUT", "GET", "DELETE"])
+def handle_single_article(articles_id):
 
-#     # PUT Method
+    # PUT Method
 
-#     if request.method == "PUT":
-#         body = request.get_json(skill_id)
+    if request.method == "PUT":
+        body = request.get_json(articles_id)
 
-#         if body is None:
-#             raise APIException('You need to specify the request body as a json object', status_code = 400)
+        if body is None:
+            raise APIException('You need to specify the request body as a json object', status_code = 400)
         
-#         skills = SoftSkills.query.get(skill_id)
-#         if "name" in body:
-#             skills.name = body['name']
-#         if 'skillImage' in body:
-#             skills.skillImage = body['skillImage']
+        article = Articles.query.get(articles_id)
+        if "title" in body:
+            article.title = body['title']
+        if 'description' in body:
+            article.description = body['description']
         
-#         db.session.commit()
+        db.session.commit()
 
-#         return jsonify(skills.serialize()), 200
+        return jsonify(article.serialize()), 200
 
-#     # GET Method
+    # GET Method
 
-#     if request.method == 'GET':
-#         all_skills = SoftSkills.query.all()
-#         all_skills = list(map(lambda x: x.serialize(), all_skills))
-#         return jsonify(all_skills), 200
+    if request.method == 'GET':
+        all_articles = SoftSkills.query.all()
+        all_articles = list(map(lambda x: x.serialize(), all_articles))
+        return jsonify(all_articles), 200
 
-#     # DELETE Method
+    # DELETE Method
 
-#     if request.method == 'DELETE':
-#         skills = SoftSkills.query.get(skill_id)
-#         if skills is None:
-#             raise APIException('User not found', status_code=400)
-#         db.session.delete(skills)
-#         db.session.commit()
-#         return "ok", 200
+    if request.method == 'DELETE':
+        article = Articles.query.get(articles_id)
+        if article is None:
+            raise APIException('User not found', status_code=400)
+        db.session.delete(article)
+        db.session.commit()
+        return "ok", 200
 
     return "Invalid Method", 404
 # this only runs if `$ python src/main.py` is executed
