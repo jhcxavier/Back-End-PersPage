@@ -52,3 +52,18 @@ class SoftSkills(db.Model):
             "name": self.name,
             "skillImage": self.skillImage
         }
+
+class Articles(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(80), unique=False, nullable=False)
+    description = db.Column(db.String(1000), unique=False, nullable=False)
+
+    def __repr__(self):
+        return '<Articles %r' % self.title
+    
+    def serialize(self):
+        return{
+            "id":self.id,
+            "title": self.title,
+            "description": self.description
+        }

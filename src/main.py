@@ -7,7 +7,7 @@ from flask_migrate import Migrate
 from flask_swagger import swagger
 from flask_cors import CORS
 from utils import APIException, generate_sitemap
-from models import db, Projects, TechSkills, SoftSkills
+from models import db, Projects, TechSkills, SoftSkills, Articles
 #from models import Person
 
 app = Flask(__name__)
@@ -250,6 +250,77 @@ def handle_single_soft_skill(skill_id):
 
     return "Invalid Method", 404
 
+################################################
+# ARTICLES METHODS
+################################################
+
+#POST AND GET
+@app.route('/articles', methods=['POST', 'GET'])
+def handle_articles():
+
+        #POST method
+    if request.method == "POST":
+        body = request.get_json()
+        #Conditions for request!
+        if body is None:
+            raise APIException("You need to specify the request body as a json object", status_code=400)
+        if "title" not in body:
+            raise APIException('You need to specify the title', status_code=400)
+        if "description" not in body:
+            raise APIException('You need to specify the description', status_code=400)
+        
+        article = Articles(title = body['title'], description = body["description"])
+        db.session.add(article)
+        db.session.commit()
+
+        return 'ok', 200
+
+        #GET Method
+    if request.method == 'GET':
+        all_articles = Articles.query.all()
+        all_articles = list(map(lambda x: x.serialize(), all_articles))
+        return jsonify(all_articles), 200
+
+#PUT, GET AND DELETE
+# @app.route("/softskills/<int:skill_id>", methods=["PUT", "GET", "DELETE"])
+# def handle_single_soft_skill(skill_id):
+
+#     # PUT Method
+
+#     if request.method == "PUT":
+#         body = request.get_json(skill_id)
+
+#         if body is None:
+#             raise APIException('You need to specify the request body as a json object', status_code = 400)
+        
+#         skills = SoftSkills.query.get(skill_id)
+#         if "name" in body:
+#             skills.name = body['name']
+#         if 'skillImage' in body:
+#             skills.skillImage = body['skillImage']
+        
+#         db.session.commit()
+
+#         return jsonify(skills.serialize()), 200
+
+#     # GET Method
+
+#     if request.method == 'GET':
+#         all_skills = SoftSkills.query.all()
+#         all_skills = list(map(lambda x: x.serialize(), all_skills))
+#         return jsonify(all_skills), 200
+
+#     # DELETE Method
+
+#     if request.method == 'DELETE':
+#         skills = SoftSkills.query.get(skill_id)
+#         if skills is None:
+#             raise APIException('User not found', status_code=400)
+#         db.session.delete(skills)
+#         db.session.commit()
+#         return "ok", 200
+
+    return "Invalid Method", 404
 # this only runs if `$ python src/main.py` is executed
 if __name__ == '__main__':
     PORT = int(os.environ.get('PORT', 3000))
