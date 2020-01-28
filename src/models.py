@@ -67,3 +67,16 @@ class Articles(db.Model):
             "title": self.title,
             "description": self.description
         }
+
+class About(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    description = db.Column(db.String(1600), unique=False, nullable=False)
+
+    def __repr__(self):
+        return '<About %r' % self.decription
+    
+    def serialize(self):
+        return{
+            "id":self.id,
+            "description": self.description
+        }

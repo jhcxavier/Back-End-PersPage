@@ -7,7 +7,7 @@ from flask_migrate import Migrate
 from flask_swagger import swagger
 from flask_cors import CORS
 from utils import APIException, generate_sitemap
-from models import db, Projects, TechSkills, SoftSkills, Articles
+from models import db, Projects, TechSkills, SoftSkills, Articles, About
 #from models import Person
 
 app = Flask(__name__)
