@@ -320,6 +320,82 @@ def handle_single_article(articles_id):
         db.session.commit()
         return "ok", 200
 
+################################################
+# ABOUT METHODS
+################################################
+
+#POST AND GET
+@app.route('/about', methods=['POST', 'GET'])
+def handle_about():
+
+        #POST method
+    if request.method == "POST":
+        body = request.get_json()
+        #Conditions for request!
+        if body is None:
+            raise APIException("You need to specify the request body as a json object", status_code=400)
+        if "description" not in body:
+            raise APIException('You need to specify the description', status_code=400)
+        if "image" not in body:
+            raise APIException('You need to specify the image', status_code=400)
+        if "resume" not in body:
+            raise APIException('You need to specify the resume', status_code=400)
+        
+        # about = About(description = body["description"])
+        db.session.add(About(description = body["description"], image= body['image'], resume=body["resume"]))
+        db.session.commit()
+
+        return 'ok', 200
+
+        #GET Method
+    if request.method == 'GET':
+        all_about = About.query.all()
+        all_about = list(map(lambda x: x.serialize(), all_about))
+        return jsonify(all_about), 200
+
+# PUT, GET AND DELETE
+@app.route("/about/<int:about_id>", methods=["PUT", "GET", "DELETE"])
+def handle_single_about(about_id):
+
+    # PUT Method
+
+    if request.method == "PUT":
+        body = request.get_json(about_id)
+
+        if body is None:
+            raise APIException('You need to specify the request body as a json object', status_code = 400)
+        
+        about = About.query.get(about_id)
+        if "title" in body:
+            about.title = body['title']
+        if 'description' in body:
+            about.description = body['description']
+        if 'image' in body:
+            about.image = body['image']
+        if 'resume' in body:
+            about.resume = body['resume']
+        
+        db.session.commit()
+
+        return jsonify(about.serialize()), 200
+
+    # GET Method
+
+    if request.method == 'GET':
+        all_about = About.query.all()
+        all_about = list(map(lambda x: x.serialize(), all_about))
+        return jsonify(all_about), 200
+
+    # DELETE Method
+
+    if request.method == 'DELETE':
+        about = About.query.get(about_id)
+        if about is None:
+            raise APIException('User not found', status_code=400)
+        db.session.delete(about)
+        db.session.commit()
+        return "ok", 200
+
     return "Invalid Method", 404
 # this only runs if `$ python src/main.py` is executed
 if __name__ == '__main__':

@@ -71,6 +71,8 @@ class Articles(db.Model):
 class About(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     description = db.Column(db.String(1600), unique=False, nullable=False)
+    image = db.Column(db.String(60), unique=True, nullable=False)
+    resume = db.Column(db.String(60), unique=True, nullable=False)
 
     def __repr__(self):
         return '<About %r' % self.decription
@@ -78,5 +80,7 @@ class About(db.Model):
     def serialize(self):
         return{
             "id":self.id,
-            "description": self.description
+            "description": self.description,
+            "image":self.image,
+            "resume":self.resume
         }
