@@ -2,21 +2,27 @@
 This module takes care of starting the API Server, Loading the DB and Adding the endpoints
 """
 import os
+# from os import environ
 from flask import Flask, request, jsonify, url_for
 from flask_migrate import Migrate
 from flask_swagger import swagger
 from flask_cors import CORS
 from utils import APIException, generate_sitemap
 from models import db, Projects, TechSkills, SoftSkills, Articles, About, User
-#from models import Person
+from flask_jwt_simple import (
+    JWTManager, jwt_required, create_jwt, get_jwt_identity
+)
 
 app = Flask(__name__)
 app.url_map.strict_slashes = False
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DB_CONNECTION_STRING')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 MIGRATE = Migrate(app, db)
 db.init_app(app)
 CORS(app)
+app.config['JWT_SECRET_KEY'] = os.environ.get('SECRET_KEY') 
+jwt = JWTManager(app)
 
 # Handle/serialize errors like a JSON object
 @app.errorhandler(APIException)
@@ -32,8 +38,7 @@ def sitemap():
 # JWT
 ################################################
 # Setup the Flask-JWT-Simple extension for example
-app.config['JWT_SECRET_KEY'] = 'teste'  
-jwt = JWTManager(app)
+
 
 # Provide a method to create access tokens. The create_jwt()
 # function is used to actually generate the token
@@ -67,6 +72,7 @@ def login():
 ################################################
 #POST AND GET
 @app.route('/user', methods=['POST', 'GET'])
+@jwt_required
 def handle_user():
 
         #POST method
