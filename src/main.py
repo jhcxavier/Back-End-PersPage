@@ -7,7 +7,7 @@ from flask_migrate import Migrate
 from flask_swagger import swagger
 from flask_cors import CORS
 from utils import APIException, generate_sitemap
-from models import db, Projects, TechSkills, SoftSkills, Articles, About
+from models import db, Projects, TechSkills, SoftSkills, Articles, About, User
 #from models import Person
 
 app = Flask(__name__)
@@ -33,6 +33,73 @@ def sitemap():
 ################################################
 # USER METHODS
 ################################################
+#POST AND GET
+@app.route('/user', methods=['POST', 'GET'])
+def handle_user():
+
+        #POST method
+    if request.method == "POST":
+        body = request.get_json()
+        #Conditions for request!
+        if body is None:
+            raise APIException("You need to specify the request body as a json object", status_code=400)
+        if "email" not in body:
+            raise APIException('You need to specify the email', status_code=400)
+        if "password" not in body:
+            raise APIException('You need to specify the password', status_code=400)
+        
+        user1 = User(email = body['email'], password = body["password"])
+        db.session.add(user1)
+        db.session.commit()
+
+        return 'ok', 200
+
+        #GET Method
+    if request.method == 'GET':
+        all_users = User.query.all()
+        all_users = list(map(lambda x: x.serialize(), all_users))
+        return jsonify(all_users), 200
+
+#PUT, GET AND DELETE
+@app.route("/user/<int:user_id>", methods=["PUT", "GET", "DELETE"])
+def handle_single_user(user_id):
+
+    # PUT Method
+
+    if request.method == "PUT":
+        body = request.get_json(user_id)
+
+        if body is None:
+            raise APIException('You need to specify the request body as a json object', status_code = 400)
+        
+        user = User.query.get(user_id)
+        if "email" in body:
+            user.email = body['email']
+        if 'password' in body:
+            user.password = body['password']
+        
+        db.session.commit()
+
+        return jsonify(user.serialize()), 200
+
+    # GET Method
+
+    if request.method == 'GET':
+        all_users = User.query.all()
+        all_users = list(map(lambda x: x.serialize(), all_users))
+        return jsonify(all_users), 200
+
+    # DELETE Method
+
+    if request.method == 'DELETE':
+        user = User.query.get(user_id)
+        if user is None:
+            raise APIException('User not found', status_code=400)
+        db.session.delete(user)
+        db.session.commit()
+        return "ok", 200
+
+    return "Invalid Method", 404
 
 
 ################################################
