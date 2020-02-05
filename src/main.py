@@ -51,7 +51,7 @@ def login():
     email = params.get('email', None)
     password = params.get('password', None)
 
-    if not username:
+    if not email:
         return jsonify({"msg": "Missing email in request"}), 400
     if not password:
         return jsonify({"msg": "Missing password in request"}), 400
