@@ -28,7 +28,39 @@ def handle_invalid_usage(error):
 def sitemap():
     return generate_sitemap(app)
 
+################################################
+# JWT
+################################################
+# Setup the Flask-JWT-Simple extension for example
+app.config['JWT_SECRET_KEY'] = 'teste'  
+jwt = JWTManager(app)
 
+# Provide a method to create access tokens. The create_jwt()
+# function is used to actually generate the token
+@app.route('/login', methods=['POST'])
+def login():
+    if not request.is_json:
+        return jsonify({"msg": "Missing JSON in request"}), 400
+
+    params = request.get_json()
+    email = params.get('email', None)
+    password = params.get('password', None)
+
+    if not username:
+        return jsonify({"msg": "Missing email in request"}), 400
+    if not password:
+        return jsonify({"msg": "Missing password in request"}), 400
+
+    # check for user in database
+    usercheck = User.query.filter_by(email=email, password=password).first()
+
+    # if user not found
+    if usercheck == None:
+        return jsonify({"msg": "Invalid credentials provided"}), 401
+
+    #if user found, Identity can be any data that is json serializable
+    ret = {'jwt': create_jwt(identity=email)}
+    return jsonify(ret), 200
 
 ################################################
 # USER METHODS
