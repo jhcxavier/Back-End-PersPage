@@ -72,7 +72,6 @@ def login():
 ################################################
 #POST AND GET
 @app.route('/user', methods=['POST', 'GET'])
-@jwt_required
 def handle_user():
 
         #POST method
