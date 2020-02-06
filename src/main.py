@@ -71,8 +71,8 @@ def login():
 # USER METHODS
 ################################################
 #POST AND GET
-@app.route('/user', methods=['POST', 'GET'])
-def handle_user():
+@app.route('/user', methods=['POST'])
+def create_user():
 
         #POST method
     if request.method == "POST":
@@ -87,18 +87,22 @@ def handle_user():
         if "password" not in body:
             raise APIException('You need to specify the password', status_code=400)
         
-        user1 = User(name= body["name"] email = body['email'], password = body["password"])
+        user1 = User(name = body["name"], email=body["email"], password =body["password"])
         db.session.add(user1)
         db.session.commit()
 
         return 'ok', 200
 
-        #GET Method
+    
+#GET USER
+@app.route('/user', methods=['GET'])
+@jwt_required
+def get_user():
     if request.method == 'GET':
         all_users = User.query.all()
         all_users = list(map(lambda x: x.serialize(), all_users))
         return jsonify(all_users), 200
-
+    
 #PUT, GET AND DELETE
 @app.route("/user/<int:user_id>", methods=["PUT", "GET", "DELETE"])
 def handle_single_user(user_id):
