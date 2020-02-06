@@ -80,12 +80,14 @@ def handle_user():
         #Conditions for request!
         if body is None:
             raise APIException("You need to specify the request body as a json object", status_code=400)
+        if "name" not in body:
+            raise APIException('You need to specify the name', status_code=400)
         if "email" not in body:
             raise APIException('You need to specify the email', status_code=400)
         if "password" not in body:
             raise APIException('You need to specify the password', status_code=400)
         
-        user1 = User(email = body['email'], password = body["password"])
+        user1 = User(name= body["name"] email = body['email'], password = body["password"])
         db.session.add(user1)
         db.session.commit()
 
@@ -110,6 +112,8 @@ def handle_single_user(user_id):
             raise APIException('You need to specify the request body as a json object', status_code = 400)
         
         user = User.query.get(user_id)
+        if "name" in body:
+            user.name = body['name']
         if "email" in body:
             user.email = body['email']
         if 'password' in body:
