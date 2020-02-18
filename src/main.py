@@ -34,7 +34,6 @@ def handle_invalid_usage(error):
 def sitemap():
     return generate_sitemap(app)
 
-################################################
 # JWT
 ################################################
 # Setup the Flask-JWT-Simple extension for example
